@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="On explicit save action" serverName="ssh://pyvip@192.168.85.129:22/home/pyvip/.virtualenvs/py2env/bin/python2" autoUploadExternalChanges="true" showEqualInSync="true" showNewOnSourceInSync="false">
+    <serverData>
+      <paths name="ssh://pyvip@192.168.85.129:22/home/pyvip/.virtualenvs/py2env/bin/python2">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/pyvip/django" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ON_EXPLICIT_SAVE" />
+  </component>
+</project>

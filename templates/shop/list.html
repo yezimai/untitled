@@ -1,0 +1,108 @@
+
+{% extends 'shop_base.html' %}
+{% load staticfiles %}
+{% load xx %}
+{% block css %}
+
+{#<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">#}
+{#<<link rel="stylesheet" type="text/css" href="{% static 'font-awesome/css/font-awesome.min.css' %}">#}
+<style>
+    .cart-icon:hover{
+        cursor:pointer;
+
+    }
+</style>
+{% endblock css %}
+{% block shop_js %}
+    <script type="text/javascript" src="{{ STATIC_URL }}js/list.js"></script>
+{% endblock shop_js %}
+
+
+{% block index_content %} {{ block.super }}
+    <div class="breadcrumb">
+        <a href="{% url 'shop:index' %}">全部分类</a>
+        <span>></span>
+        <a href="#">{% get_category_name cid %}</a>
+    </div>
+
+    <div class="main_wrap clearfix">
+        <div class="l_wrap fl clearfix">
+            <div class="new_goods">
+                <h3>新品推荐{{ request.user.id }}</h3>
+                {% refferral_goods  cid  %}
+            </div>
+        </div>
+
+        <div class="r_wrap fr clearfix">
+            <div class="sort_bar">
+                {% order_tag order_map curr_order new_order_key %}<!--s设置排序标签-->
+{#                {% for k,v in order_map.items %}#}
+{#                 <a href="?curr_order={{ k }}" {% if curr_order == k %} class="active" {% endif %}>{{ v }}</a>#}
+{#                {% endfor  %}#}
+            </div>
+
+            <ul class="goods_type_list clearfix">
+                {% for item in querysets.object_list %}
+                    <li><a href="{% url 'shop:detail' item.id  %}">
+                        <img src="{{ MEDIA_URL }}{{ item.images }}">
+                        <h4>{{ item.name }}</a></h4>
+                        <div class="operate">
+                            <span class="prize">￥{{ item.price }}元</span>
+                            <span class="unit">单位：{{ item.unit }}</span>
+{#                            /点击:{{ item.click }}#}
+                            <span id="add_url" hidden>{{ item.id }}</span>
+                            <i  class="add_goods cart-icon" {% if request.user.username %} onclick="order_goods(this)" {% else %} onclick=window.location.href="{% url 'user:login' %}"{% endif %} id="{{ item.id }}" title="加入购物车"></i>
+                            <!--i  class="add_goods cart-icon"  id="{{ item.id }}" title="加入购物车"></i-->
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+
+            <div class="pagenation">
+                <ul class="pagenation">
+                    {% condtions_html filter_conditions as i %}
+                    <a href="?curr_page=1{{ i }}">首页</a>
+                    {% divide_page current_page  paginator  i %}
+                    <a href="?curr_page={{ paginator.num_pages }}{{ i }}">尾页</a>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+{% endblock index_content %}
+{% block script-footer %}
+    <script>
+        function order_goods(self) {
+            var add_url = $('#add_url').text();
+            var $show_count = $('#show_count');
+            var select_goods = [];
+            var good_id = $(self).attr('id');
+            console.log(good_id)
+            var goods_num = parseInt($show_count.text());
+            select_goods.push(good_id);
+            $('.cart_name').attr('id',good_id);
+
+            $.post("{% url 'shop:shopping_list' %}",{'select_good':good_id,'amount':1}, function(callback){
+                console.log(callback.status);
+                if (callback.status == '1'){  //如果是新购买的就数量加1
+                    $show_count.text(goods_num + 1);
+                }
+            })
+
+
+        }
+
+        function login(self){
+            alert('loginurl');
+        }
+    </script>
+{% endblock script-footer %}
+
+
+
+{#    function ChangeSort(self) {#}
+{#        var curr_order = $(this).#}
+{#        $('self').attr('curr_order',)#}
+{##}
+{#    }#}

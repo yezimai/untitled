@@ -1,0 +1,53 @@
+{% extends 'base.html' %} 
+{% load staticfiles %}
+{% load xx %}
+{% block title %} 天天生鲜首页{% endblock title %} 
+
+{#{% block css %}#}
+{#    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css"> #}
+{#{% endblock css %}#}
+{% block css %}
+
+
+{% endblock css %}
+{% block js %}
+    <script type="text/javascript" src="{% static 'js/slide.js' %}"></script>
+{% block shop_js %}
+
+{% endblock shop_js %}
+{% endblock js %} 
+{% block content %}
+    <div class="search_bar clearfix">
+        <a href="{% url 'shop:index' %}" class="logo fl"><img src="{% static 'images/logo.png' %}"></a>
+        <div class="search_con fl">
+            <form method='get' action="/search/">
+                {% get_q_keyname request as i %}
+                <input type="text" class="input_text fl" name="q" {% if i %} value="{{ i }}" {% else %} placeholder="搜索商品" {% endif %}>
+                <input type="submit" class="input_btn fr" name="" value="搜索">
+            </form>
+
+        </div>
+
+        <div class="guest_cart fr cart-fixed">
+            <a href="{% url 'shop_cart:cart' %}" class="cart_name fl" id="">我的购物车</a>
+
+            <div class="goods_count fl" id="show_count">{{ order_nums }}</div>
+        </div>
+
+    </div>
+
+    <div class="navbar_con">
+        <div class="navbar">
+            <h1 class="fl">全部商品分类</h1>
+                <ul class="navlist fl">
+                    <li><a href="{% url 'shop:index' %}">首页</a></li>
+                    {% for category in category_list %}
+                    <li class="interval">|</li>
+                    <li><a href={% url 'shop:categorys' category.id %}>{{category.name}}</a></li>
+                    {% endfor %}
+                </ul>
+        </div>
+    </div>
+    {% block index_content %} 
+    {% endblock index_content %} 
+{% endblock content %}

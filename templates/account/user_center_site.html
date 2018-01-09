@@ -1,0 +1,150 @@
+{% extends 'user_base.html' %}
+{% load xx %}
+{% block user_content %}
+    {% block css %}
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css">
+    {% endblock css %}
+    {% block js %}
+        <script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/jquery.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+    {% endblock js %}
+    <div class="right_content clearfix">
+        <div>
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="{{ message.tags }}">
+                            {{ message|safe }}
+                            <a href="#" class="close"> </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <h3 class="common_title2">默认收货地址</h3>
+        <div class="site_con">
+            <dl>
+                <dt>当前地址:<span class="pull-right"><a href="{% url 'shop_cart:order' %}" class="btn btn-success" data_id="{{info.id}}">买单</a></span>
+                </dt>
+{#                    <dd id="moren">{{ request.user.receiver_name }}&nbsp;&nbsp;#}
+{#                        &nbsp;&nbsp;{{ request.user.address }}&nbsp;&nbsp;#}
+{#                        （{{ request.user.receiver_name }} 收）&nbsp;&nbsp; {{ request.user.telephone_number }}#}
+{#                    </dd>#}
+                {% if request.user.receiver_id != 0 %}
+                    <dd id="moren">{% default_address request.user %}
+                    </dd>
+                {% else %}
+                    <dd id="moren"></dd>
+                {% endif %}
+
+            </dl>
+            {% for info in receiver_infos %}
+                <div class="panel panel-default block_{{ info.id }}">
+                    <div class="panel-heading">
+                        <p><span style="font-size: 18px" id="name{{ forloop.counter }}">{{ info.name }}</span>&nbsp;&nbsp;
+                            <span
+                                    style="margin-left: 30px"
+                                    id="telephone{{ forloop.counter }}">{{ info.telephone }}</span></p>
+                        <div id="address{{ forloop.counter }}">
+                            {{ info.address }}
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        {% if info.id == request.user.receiver_id %}
+                        <input type="radio" name="address_check" class="pull-left" data_id="{{info.id}}" checked="checked">&nbsp;&nbsp;设置为默认地址
+                        {% else %}
+                         <input type="radio" name="address_check" class="pull-left" data_id="{{info.id}}">&nbsp;&nbsp;设置为默认地址
+                        {% endif %}
+
+                        <span class="pull-right"><a href="?id={{ info.id }}"
+                                                    class="btn btn-danger" data_id="{{info.id}}">删除</a></span>
+                        <span class="pull-right"><a type="button" class="btn btn-primary pull-right" data-toggle="modal"
+                                                    data-target="#myModal_{{ info.id }}" style="margin-right: 10px" data_id="{{ info.id }}">编辑</a></span>
+                        {% include 'account/edite_address.html' %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% include 'account/receiver_address.html' %}
+    </div>
+    <script>
+    $(function () {
+        var $radio = $(".site_con input[type='radio']")
+        $radio.click(function () {
+            var data_id = $(this).attr("data_id");
+            if($(this).is(":checked")){
+                $.get("{% url 'user:user_center_set_default_site' %}?data_id="+data_id,function(data){
+                    $("#moren").html(data.name + '&nbsp;&nbsp;&nbsp;&nbsp;' + data.address + '&nbsp;&nbsp;' + '（' + data.name + '收）&nbsp;&nbsp;' + data.telephone);
+                })
+            }
+        })
+        $(".btn-danger").click(function(){
+            var data_id = $(this).attr("data_id");
+            if(confirm("是否确认删除?")){
+                $.get("{% url 'user:user_center_del_default_site' %}?data_id="+data_id,function(result){
+                    console.log(result.status);
+                    if(result.status==0){
+{#                        alert("删除成功");#}
+                        $(".block_"+data_id).remove();
+
+                        $("#moren").html('');
+                    }
+                })
+            }
+        })
+
+    })
+{#        $(function () {#}
+{#            var $radio = $($(".site_con input[type='radio']"));#}
+{#            $radio.each(function (index) {#}
+{#                $radio.eq(index).click(function () {#}
+{#                    if ($radio.eq(index).prop('checked')) {#}
+{#                        var name = $('#name' + (index + 1)).text();#}
+{#                        var telephone = $('#telephone' + (index + 1)).text();#}
+{#                        var address = $('#address' + (index + 1)).text();#}
+{#                        var data = {'name': name, 'telephone': telephone, 'address': address};#}
+{#                        $.get('{% url 'user:modify_address' %}', data, function (data) {#}
+{#                            console.log(data);#}
+{#                            $('#moren').html(data.name + '&nbsp;&nbsp; 海淀区 &nbsp;&nbsp;' + data.address + '&nbsp;&nbsp;' + '（' + data.name + '收）&nbsp;&nbsp;' + data.telephone)#}
+{#                        });#}
+{#                    }#}
+{#                })#}
+{#            })#}
+{#        })#}
+    </script>
+{% endblock user_content %}
+
+
+
+
+{#下面是使用表格来显示的 现在改为了 使用面板来显示#}
+{##}
+{#      <h3 class="common_title2">收货人:</h3>#}
+{#        <div class="site_con">#}
+{#            <table class="table table-strip table-hover">#}
+{#                <tr>#}
+{#                    <td><input type="checkbox" name="check"></td>#}
+{#                    <td>编号</td>#}
+{#                    <td>收件人</td>#}
+{#                    <td>联系电话</td>#}
+{#                    <td>城市</td>#}
+{#                    <td>地址</td>#}
+{#                    <td>操作</td>#}
+{#                    >#}
+{#                </tr>#}
+{#                {% for info in receiver_info %}#}
+{#                    <tr>#}
+{#                        <td><input type="checkbox" name="check"></td>#}
+{#                        <td>{{ forloop.counter }}</td>#}
+{#                        <td>{{ info.name }}</td>#}
+{#                        <td>{{ info.telephone }}</td>#}
+{#                        <td>{{ info.city }}</td>#}
+{#                        <td>{{ info.address }}</td>#}
+{#                        <td><a href="">编辑</a></td>#}
+{#                        <td><a href="">删除</a></td>#}
+{#                        <td><a href="">设为默认</a></td>#}
+{#                    </tr>#}
+{#                {% endfor %}#}
+{#            </table>#}
+{#            {% include 'user/receiver_address.html' %}#}
+{#        </div>#}
